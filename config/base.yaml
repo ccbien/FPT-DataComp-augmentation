@@ -1,0 +1,21 @@
+input_dir: '../dataset_small'
+output_dir: '../dataset_small_v3'
+overwrite: true
+
+limit:
+  train: 14
+  val: 10
+  public_test: 10
+
+keep_origin:
+  train: true
+  val: true
+  public_test: true
+
+# Augmentation
+gaussian_blur:
+  use: true
+  sigma_min: 0
+  sigma_max: 3.0
+
+# TO BE CONTINUE
