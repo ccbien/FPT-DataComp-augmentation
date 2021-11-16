@@ -1,21 +1,34 @@
 input_dir: '../dataset_small'
-output_dir: '../dataset_small_v3'
+output_dir: '../dataset_small_v2'
 overwrite: true
 
 limit:
-  train: 14
-  val: 10
-  public_test: 10
+  train: 30
+  val: 12
+  public_test: 12
 
 keep_origin:
   train: true
   val: true
   public_test: true
 
-# Augmentation
+# Color augmentation
 gaussian_blur:
-  use: true
+  prob: 1
   sigma_min: 0
   sigma_max: 3.0
+
+linear_contrast:
+  prob: 0
+  alpha_min: 0.6
+  alpha_max: 1.4
+
+add_to_brightness:
+  prob: 0.5
+  min: -30
+  max: 30
+
+# Geometric 
+
 
 # TO BE CONTINUE

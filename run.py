@@ -67,13 +67,11 @@ def main(cf):
                 name_aug = name + '_%02d' % i
                 imsave(
                     os.path.join(image_dst[kind], name_aug + '.jpg'),
-                    image_aug
-                )
+                    image_aug)
                 write_annotation(
                     os.path.join(label_dst[kind], name_aug + '.txt'),
                     labels,
-                    bboxes_aug
-                )
+                    bboxes_aug)
                 count += 1
                 if count == cf.limit[kind]: break
             if count == cf.limit[kind]: break

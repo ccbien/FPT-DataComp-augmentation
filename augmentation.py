@@ -1,3 +1,4 @@
+import numpy as np
 import imgaug as ia
 import imgaug.augmenters as iaa
 from imgaug.augmentables.bbs import BoundingBox, BoundingBoxesOnImage
@@ -5,11 +6,24 @@ from imgaug.augmentables.bbs import BoundingBox, BoundingBoxesOnImage
 
 class Augmentor:
     def __init__(self, cf):
-        self.seq = iaa.Sequential(random_order=True)
+        self.seq = []
+        self.probs = []
 
-        if cf.gaussian_blur.use:
+        if cf.gaussian_blur.prob > 0:
             sigma = (cf.gaussian_blur.sigma_min, cf.gaussian_blur.sigma_max)
-            self.seq.add(iaa.blur.GaussianBlur(sigma=sigma))
+            self.seq.append(iaa.blur.GaussianBlur(sigma=sigma))
+            self.probs.append(cf.gaussian_blur.prob)
+
+        if cf.linear_contrast.prob > 0:
+            alpha = (cf.linear_contrast.alpha_min, cf.linear_contrast.alpha_max)
+            self.seq.append(iaa.contrast.LinearContrast(alpha=alpha))
+            self.probs.append(cf.linear_contrast.prob)
+
+        if cf.add_to_brightness.use:
+            self.seq.append(iaa.AddToBrightness(add=(cf.add_to_brightness.min, cf.add_to_brightness.max)))
+            self.probs.append(cf.add_to_brightness.prob)
+
+        
         # TO BE CONTINUE
 
 
@@ -30,8 +44,11 @@ class Augmentor:
             bb_list.append(BoundingBox(x1=x - w / 2, y1=y - h/2, x2=x + w/2, y2=y + h/2))
         bbs = BoundingBoxesOnImage(bb_list, shape=image.shape)
 
-        ia.seed(1)
-        image_aug, bbs_aug = self.seq(image=image, bounding_boxes=bbs)
+        # ia.seed(1)
+        image_aug, bbs_aug = image, bbs
+        for aug, p in zip(self.seq, self.probs):
+            if np.random.rand() < p:
+                image_aug, bbs_aug = aug(image=image_aug, bounding_boxes=bbs_aug)
         # TO BE CONTINUE
         
         bboxes_aug = []
