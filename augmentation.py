@@ -19,10 +19,21 @@ class Augmentor:
             self.seq.append(iaa.contrast.LinearContrast(alpha=alpha))
             self.probs.append(cf.linear_contrast.prob)
 
-        if cf.add_to_brightness.use:
+        if cf.add_to_brightness.prob > 0:
             self.seq.append(iaa.AddToBrightness(add=(cf.add_to_brightness.min, cf.add_to_brightness.max)))
             self.probs.append(cf.add_to_brightness.prob)
 
+        if cf.crop.prob > 0:
+            self.seq.append(iaa.Crop(percent=(cf.crop.min_ratio, cf.crop.max_ratio)))
+            self.probs.append(cf.crop.prob) 
+
+        if cf.flip_horizontal.prob > 0:
+            self.seq.append(iaa.flip.Fliplr(1.0))
+            self.probs.append(cf.flip_horizontal.prob)
+
+        if cf.rotate.prob > 0:
+            self.seq.append(iaa.Rotate(rotate=(cf.rotate.min_angle, cf.rotate.max_angle)))
+            self.probs.append(cf.rotate.prob)
         
         # TO BE CONTINUE
 
