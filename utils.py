@@ -48,3 +48,17 @@ def write_annotation(anno_path, labels, bboxes):
     lines[-1] = lines[-1][:-1]
     with open(anno_path, 'w') as f:
         f.writelines(lines)
+
+def yolo2normal(bbox, W, H):
+    x, y, w, h = bbox
+    w *= W
+    h *= H
+    x = x * W - w / 2
+    y = y * H - h / 2
+    return x, y, w, h
+
+def normal2yolo(bbox, W, H):
+    x, y, w, h = bbox
+    x += w / 2
+    y += h / 2
+    return x / W, y / H, w / W, h / H

@@ -42,6 +42,9 @@ def main(cf):
                 labels, bboxes = read_annotation(label_path[name])
 
                 image_aug, bboxes_aug = augmentor.process(image, bboxes)
+                if len(bboxes_aug) == 0:
+                    continue
+                
                 name_aug = name + '_%02d' % i
                 imsave(os.path.join(image_dst, name_aug + '.jpg'), image_aug)
                 write_annotation(os.path.join(label_dst, name_aug + '.txt'), labels, bboxes_aug)

@@ -1,9 +1,9 @@
-input_dir: '../datasets/00-small'
-output_dir: '../datasets/03-small'
+input_dir: '../datasets/small/01'
+output_dir: '../datasets/small/01-aug'
 overwrite: true
 
-limit: 64 # always > 0
-keep_origin: true
+limit: 10 # always > 0
+keep_origin: false
 
 # Color
 gaussian_blur:
@@ -22,19 +22,37 @@ add_to_brightness:
   max: 30
 
 # Geometric 
+rotate:
+  prob: 0
+  min_angle: 90
+  max_angle: 90
+
+flip_lr:
+  prob: 0.5
+
 crop:
-  prob: 1
+  prob: 0
   min_ratio: 0.2
   max_ratio: 0.2
 
-flip_horizontal:
-  prob: 0.0
-
-rotate:
+scale_x:
   prob: 1
-  min_angle: -90
-  max_angle: 90
+  min_scale: 0.7
+  max_scale: 1.3
 
+scale_y:
+  prob: 1
+  min_scale: 0.7
+  max_scale: 1.3
 
+shear_x:
+  prob: 1
+  min_angle: -20
+  max_angle: 20
+
+shear_y:
+  prob: 1
+  min_angle: -20
+  max_angle: 20
 
 # TO BE CONTINUE
