@@ -7,74 +7,50 @@ from omegaconf import OmegaConf
 from skimage.io import imread, imsave
 
 from augmentation import Augmentor
-from utils import read_annotation, write_annotation
+from utils import *
 
 
-def prepare_paths(cf):
-    image_src = {
-        'train': os.path.join(cf.input_dir, 'images/train'),
-        'val': os.path.join(cf.input_dir, 'images/val'),
-        'public_test': os.path.join(cf.input_dir, 'images/public_test')
-    }
-    label_src = {
-        'train': os.path.join(cf.input_dir, 'labels/train'),
-        'val': os.path.join(cf.input_dir, 'labels/val'),
-        'public_test': os.path.join(cf.input_dir, 'labels/public_test')
-    }
-    image_dst = {
-        'train': os.path.join(cf.output_dir, 'images/train'),
-        'val': os.path.join(cf.output_dir, 'images/val'),
-        'public_test': os.path.join(cf.output_dir, 'images/public_test')
-    }
-    label_dst = {
-        'train': os.path.join(cf.output_dir, 'labels/train'),
-        'val': os.path.join(cf.output_dir, 'labels/val'),
-        'public_test': os.path.join(cf.output_dir, 'labels/public_test')
-    }
+def prepare_directories(cf):
     if os.path.isdir(cf.output_dir):
         if cf.overwrite:
             shutil.rmtree(cf.output_dir)
         else:
             raise FileExistsError('The output directory already exists')
-    return image_src, label_src, image_dst, label_dst
+    
+    image_dst = os.path.join(cf.output_dir, 'images/')
+    label_dst = os.path.join(cf.output_dir, 'labels/')
+    os.makedirs(image_dst)
+    os.makedirs(label_dst)
+    if cf.keep_origin:
+        copy_all(cf.input_dir, image_dst, label_dst)
+    return image_dst, label_dst
 
 
-def main(cf):    
-    image_src, label_src, image_dst, label_dst = prepare_paths(cf)
-    for kind in ('train', 'val', 'public_test'):
-        if cf.keep_origin[kind]:
-            shutil.copytree(image_src[kind], image_dst[kind])
-            shutil.copytree(label_src[kind], label_dst[kind])
-        else:
-            os.makedirs(image_dst[kind])
-            os.makedirs(label_dst[kind])
+def main(cf):
+    image_path = get_all_filepaths(cf.input_dir, is_image_file)
+    label_path = get_all_filepaths(cf.input_dir, is_label_file)
+    image_dst, label_dst = prepare_directories(cf)
 
+    names = sorted(list(image_path.keys()))
+    count = len(os.listdir(image_dst))
     augmentor = Augmentor(cf)
-    for kind in ('train', 'val', 'public_test'):
-        print(f'Processing "{kind}":')
-        files = sorted(os.listdir(image_src[kind]))
-        count = len(os.listdir(image_dst[kind]))
-        for i in range(100): # big enough
-            for file in tqdm(files):
 
-                if not file.endswith('.jpg'): continue
-                name = file[:-4]
-                image = imread(os.path.join(image_src[kind], file))
-                labels, bboxes = read_annotation(
-                    os.path.join(label_src[kind], name + '.txt'))
+    for i in range(100): # big enough
+        for name in names:
+            try:
+                image = imread(image_path[name])
+                labels, bboxes = read_annotation(label_path[name])
 
                 image_aug, bboxes_aug = augmentor.process(image, bboxes)
                 name_aug = name + '_%02d' % i
-                imsave(
-                    os.path.join(image_dst[kind], name_aug + '.jpg'),
-                    image_aug)
-                write_annotation(
-                    os.path.join(label_dst[kind], name_aug + '.txt'),
-                    labels,
-                    bboxes_aug)
+                imsave(os.path.join(image_dst, name_aug + '.jpg'), image_aug)
+                write_annotation(os.path.join(label_dst, name_aug + '.txt'), labels, bboxes_aug)
+                
                 count += 1
-                if count == cf.limit[kind]: break
-            if count == cf.limit[kind]: break
+                print(f'{name_aug} ({count})')
+                if count == cf.limit: return
+            except:
+                print('Error', name)
 
 
 if __name__ == '__main__':

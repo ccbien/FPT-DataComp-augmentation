@@ -1,3 +1,35 @@
+import os
+import shutil
+
+def is_image_file(file):
+    return file.lower()[-4:] in ('.png', '.jpg')
+
+def is_label_file(file):
+    return file.endswith('.txt')
+
+def get_all_filepaths(src, checker):
+    path = {}
+    for root, dirs, files in os.walk(src):
+        for file in files:
+            if checker(file):
+                name = file[:file.rfind('.')]
+                path[name] = os.path.join(root, file)
+    return path
+
+def copy_all(src, image_dst=None, label_dst=None):
+    for root, dirs, files in os.walk(src):
+        for file in files:
+            if image_dst is not None and is_image_file(file):
+                shutil.copy(
+                    os.path.join(root, file),
+                    os.path.join(image_dst, file)
+                )
+            if label_dst is not None and is_label_file(file):
+                shutil.copy(
+                    os.path.join(root, file),
+                    os.path.join(label_dst, file)
+                )
+
 def read_annotation(anno_path):
     labels = []
     bboxes = []

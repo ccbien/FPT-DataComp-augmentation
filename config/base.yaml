@@ -1,45 +1,40 @@
-input_dir: '../datasets/01'
-output_dir: '../datasets/02'
+input_dir: '../datasets/00-small'
+output_dir: '../datasets/03-small'
 overwrite: true
 
-limit: # always > 0
-  train: 1584
-  val: 368
-  public_test: 176
-
-keep_origin:
-  train: true
-  val: true
-  public_test: true
+limit: 64 # always > 0
+keep_origin: true
 
 # Color
 gaussian_blur:
-  prob: 1
+  prob: 0
   sigma_min: 0
   sigma_max: 2.0
 
 linear_contrast:
-  prob: 1
+  prob: 0
   alpha_min: 0.6
   alpha_max: 1.4
 
 add_to_brightness:
-  prob: 1
+  prob: 0
   min: -30
   max: 30
 
 # Geometric 
 crop:
-  prob: 0
+  prob: 1
   min_ratio: 0.2
   max_ratio: 0.2
 
 flip_horizontal:
-  prob: 0
+  prob: 0.0
 
 rotate:
-  prob: 0
-  min_angle: 90
+  prob: 1
+  min_angle: -90
   max_angle: 90
+
+
 
 # TO BE CONTINUE
