@@ -50,7 +50,8 @@ def main(cf):
                 write_annotation(os.path.join(label_dst, name_aug + '.txt'), labels, bboxes_aug)
                 
                 count += 1
-                print(f'{name_aug} ({count})')
+                if count % 10 == 0:
+                    print(f'{name_aug} ({count})')
                 if count == cf.limit: return
             except:
                 print('Error', name)
